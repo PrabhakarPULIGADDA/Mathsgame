@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspirational Matching Pairs Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .card {
+            padding: 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .card.matched {
+            background-color: #8bc34a; /* green */
+            color: #fff;
+        }
+
+        .card.selected {
+            background-color: #2196f3; /* blue */
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="start-page">
+        <h1>Namaskaram 🙏</h1>
+        <h2>Inspirational Matching Pairs Game</h2>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+    
+    <div class="container" id="game-page" style="display:none;">
+        <h2>Inspirational Matching Pairs Game</h2>
+        <p>Match the pairs of cards to reveal inspirational quotes:</p>
+        <div id="game-board" class="board"></div>
+        <button onclick="restartGame()">Restart</button>
+    </div>
+    
+    <div class="container" id="end-page" style="display:none;">
+        <h2>Congratulations!</h2>
+        <p>You've completed the Inspirational Matching Pairs Game.</p>
+        <button onclick="showLinks()">Useful Links</button>
+    </div>
+    
+    <footer id="links" style="display:none;">
+        <p>Useful Links:</p>
+        <ul>
+            <li><a href="https://www.linkedin.com">LinkedIn</a></li>
+            <li><a href="https://www.arvindguptatoys.com">Aravind Gupta</a></li>
+        </ul>
+        <p>Thank You!</p>
+    </footer>
+
+    <script>
+        const quotes = [
+            "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+            "Believe you can and you're halfway there. - Theodore Roosevelt",
+            "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt",
+            "Keep your face always toward the sunshine - and shadows will fall behind you. - Walt Whitman",
+            "It is never too late to be what you might have been. - George Eliot",
+            "With the new day comes new strength and new thoughts. - Eleanor Roosevelt",
+            "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson",
+            "In the middle of difficulty lies opportunity. - Albert Einstein"
+        ];
+
+        let gameQuotes = [...quotes, ...quotes]; // Double the array for matching pairs
+        let shuffledQuotes = [];
+
+        // Function to start the game
+        function startGame() {
+            shuffledQuotes = shuffle(gameQuotes);
+            displayCards();
+            document.getElementById('start-page').style.display = 'none';
+            document.getElementById('game-page').style.display = 'block';
+            document.getElementById('end-page').style.display = 'none';
+        }
+
+        // Function to shuffle the array
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex], array[currentIndex]
+                ];
+            }
+
+            return array;
+        }
+
+        // Function to display cards on the game board
+        function displayCards() {
+            let gameBoard = document.getElementById('game-board');
+            gameBoard.innerHTML = '';
+            shuffledQuotes.forEach((quote, index) => {
+                let card = document.createElement('div');
+                card.classList.add('card');
+                card.textContent = index + 1; // Display card number (for testing)
+                card.setAttribute('data-quote', quote);
+                card.addEventListener('click', selectCard);
+                gameBoard.appendChild(card);
+            });
+        }
+
+        // Function to handle card selection
+        function selectCard() {
+            if (this.classList.contains('selected') || this.classList.contains('matched')) {
+                return; // Ignore clicks on already selected or matched cards
+            }
+
+            this.classList.add('selected');
+            let selectedCards = document.querySelectorAll('.selected');
+
+            if (selectedCards.length === 2) {
+                let [firstCard, secondCard] = selectedCards;
+                let quote1 = firstCard.getAttribute('data-quote');
+                let quote2 = secondCard.getAttribute('data-quote');
+
+                if (quote1 === quote2) {
+                    selectedCards.forEach(card => {
+                        card.classList.remove('selected');
+                        card.classList.add('matched');
+                    });
+
+                    checkGameEnd();
+                } else {
+                    setTimeout(() => {
+                        selectedCards.forEach(card => card.classList.remove('selected'));
+                    }, 1000);
+                }
+            }
+        }
+
+        // Function to check if the game has ended
+        function checkGameEnd() {
+            if (document.querySelectorAll('.matched').length === shuffledQuotes.length) {
+                document.getElementById('game-page').style.display = 'none';
+                document.getElementById('end-page').style.display = 'block';
+            }
+        }
+
+        // Function to restart the game
+        function restartGame() {
+            shuffledQuotes = shuffle(gameQuotes);
+            displayCards();
+            document.getElementById('game-page').style.display = 'block';
+            document.getElementById('end-page').style.display = 'none';
+            document.getElementById('links').style.display = 'none';
+        }
+
+        // Function to show useful links
+        function showLinks() {
+            document.getElementById('links').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
