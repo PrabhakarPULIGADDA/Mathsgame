@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Age Guessing Game</title>
+    <title>Deducing Your Age Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,24 +51,44 @@
             text-align: center;
             margin-top: 10px;
         }
+
+        .instructions {
+            text-align: left;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="container" id="start-page">
-        <h1>Nammakam 🙏 - Age Guessing Game</h1>
+        <h1>Nammakam 🙏</h1>
+        <h2>Deducing Your Age Game</h2>
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Multiply the first number of your age by five.</li>
+                <li>Add three to the result.</li>
+                <li>Double the resulting figure.</li>
+                <li>Add the second number of your age to that number.</li>
+                <li>Subtract six. The result will be your current age.</li>
+            </ol>
+            <p>Click "Start Game" to begin.</p>
+        </div>
         <button onclick="startGame()">Start Game</button>
     </div>
     
     <div class="container" id="game-page" style="display:none;">
-        <h2>Age Guessing Game</h2>
+        <h2>Deducing Your Age Game</h2>
         <div id="question"></div>
         <input type="number" id="answerInput" placeholder="Enter your answer">
-        <button onclick="nextQuestion()">Next Question</button>
+        <button onclick="nextStep()">Next Step</button>
     </div>
     
     <div class="container" id="end-page" style="display:none;">
         <h2>Game Over!</h2>
-        <p>The computer has guessed your age.</p>
         <p>Your age is: <span id="guessedAge"></span></p>
         <button onclick="showLinks()">Useful Links</button>
     </div>
@@ -83,16 +103,17 @@
     </footer>
 
     <script>
-        const questions = [
-            "Are you older than 20?",
-            "Are you younger than 40?",
-            "Are you between 25 and 35 years old?",
-            "Are you in your 30s?",
-            "Are you younger than 25?"
+        const steps = [
+            "Multiply the first number of your age by five.",
+            "Add three to the result.",
+            "Double the resulting figure.",
+            "Add the second number of your age to that number.",
+            "Subtract six. The result will be your current age."
         ];
 
-        let currentQuestionIndex = 0;
-        let guessedAge = 0;
+        let currentStepIndex = 0;
+        let intermediateResult = 0;
+        let age = 0;
 
         function startGame() {
             document.getElementById('start-page').style.display = 'none';
@@ -101,33 +122,33 @@
         }
 
         function displayQuestion() {
-            if (currentQuestionIndex < questions.length) {
-                document.getElementById('question').textContent = questions[currentQuestionIndex];
+            if (currentStepIndex < steps.length) {
+                document.getElementById('question').textContent = steps[currentStepIndex];
             } else {
                 endGame();
             }
         }
 
-        function nextQuestion() {
+        function nextStep() {
             let answer = parseInt(document.getElementById('answerInput').value);
             if (isNaN(answer)) {
                 alert('Please enter a valid number.');
                 return;
             }
 
-            if (currentQuestionIndex === 0 && answer >= 20) {
-                guessedAge += answer;
-            } else if (currentQuestionIndex === 1 && answer < 40) {
-                guessedAge += (40 - answer);
-            } else if (currentQuestionIndex === 2 && answer >= 25 && answer <= 35) {
-                guessedAge += answer;
-            } else if (currentQuestionIndex === 3 && answer >= 30) {
-                guessedAge += (answer - 30);
-            } else if (currentQuestionIndex === 4 && answer < 25) {
-                guessedAge += (25 - answer);
+            if (currentStepIndex === 0) {
+                intermediateResult = answer;
+            } else if (currentStepIndex === 1) {
+                intermediateResult += 3;
+            } else if (currentStepIndex === 2) {
+                intermediateResult *= 2;
+            } else if (currentStepIndex === 3) {
+                intermediateResult += answer;
+            } else if (currentStepIndex === 4) {
+                age = intermediateResult - 6;
             }
 
-            currentQuestionIndex++;
+            currentStepIndex++;
             document.getElementById('answerInput').value = '';
             displayQuestion();
         }
@@ -135,7 +156,7 @@
         function endGame() {
             document.getElementById('game-page').style.display = 'none';
             document.getElementById('end-page').style.display = 'block';
-            document.getElementById('guessedAge').textContent = guessedAge;
+            document.getElementById('guessedAge').textContent = age;
         }
 
         function showLinks() {
