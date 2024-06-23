@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nammakam 🙏 - Memory Match Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: none;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: #555;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 80px;
+            height: 80px;
+            background-color: #ff6347;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card.flipped {
+            background-color: #00b09b;
+            transform: scale(1.05);
+        }
+
+        footer {
+            margin-top: 20px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer li {
+            display: inline;
+            margin: 0 10px;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="start-page">
+        <h1>Nammakam 🙏</h1>
+        <h2>Memory Match Game</h2>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+    
+    <div class="container" id="game-page">
+        <h2>Memory Match Game</h2>
+        <div id="instructions">
+            <h3>Instructions:</h3>
+            <p>Click on any card to reveal its symbol. Click on another card to find its matching pair.</p>
+            <p>If the symbols match, they will stay face-up. If not, both cards will flip back face-down.</p>
+            <p>Match all pairs to complete the game!</p>
+        </div>
+        <div id="game-board" class="board"></div>
+        <button onclick="restartGame()">Restart</button>
+    </div>
+    
+    <div class="container" id="end-page">
+        <h2>Congratulations!</h2>
+        <p>You've completed the Memory Match Game.</p>
+        <button onclick="showLinks()">Useful Links</button>
+    </div>
+    
+    <footer id="links">
+        <p>Useful Links:</p>
+        <ul>
+            <li><a href="https://www.linkedin.com">LinkedIn</a></li>
+            <li><a href="https://www.arvindguptatoys.com">Aravind Gupta</a></li>
+        </ul>
+        <p>Thank You!</p>
+    </footer>
+    
+    <script>
+        const symbols = ['🍎', '🍊', '🍋', '🍉', '🍇', '🍒', '🍍', '🥥'];
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let canFlip = true;
+
+        function startGame() {
+            generateCards();
+            shuffleCards();
+            displayCards();
+            document.getElementById('start-page').style.display = 'none';
+            document.getElementById('game-page').style.display = 'block';
+        }
+
+        function generateCards() {
+            for (let i = 0; i < symbols.length; i++) {
+                cards.push({ id: i, symbol: symbols[i], flipped: false, matched: false });
+                cards.push({ id: i + symbols.length, symbol: symbols[i], flipped: false, matched: false });
+            }
+        }
+
+        function shuffleCards() {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+        }
+
+        function displayCards() {
+            const gameBoard = document.getElementById('game-board');
+            gameBoard.innerHTML = '';
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                if (card.matched) {
+                    cardElement.textContent = card.symbol;
+                } else {
+                    cardElement.textContent = '';
+                }
+                cardElement.addEventListener('click', () => flipCard(card.id));
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(cardId) {
+            if (!canFlip) return;
+            const card = cards[cardId];
+            if (card.flipped || card.matched) return;
+            
+            card.flipped = true;
+            flippedCards.push(card);
+
+            updateBoard();
+
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                setTimeout(checkForMatch, 1000);
+            }
+        }
+
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.symbol === card2.symbol) {
+                card1.matched = true;
+                card2.matched = true;
+                matchedPairs++;
+                if (matchedPairs === symbols.length) {
+                    setTimeout(showEndPage, 500);
+                }
+            } else {
+                card1.flipped = false;
+                card2.flipped = false;
+            }
+            flippedCards = [];
+            canFlip = true;
+            updateBoard();
+        }
+
+        function updateBoard() {
+            const gameBoard = document.getElementById('game-board');
+            gameBoard.innerHTML = '';
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                if (card.flipped || card.matched) {
+                    cardElement.textContent = card.symbol;
+                }
+                if (card.matched) {
+                    cardElement.style.backgroundColor = '#00b09b';
+                }
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        function restartGame() {
+            cards = [];
+            flippedCards = [];
+            matchedPairs = 0;
+            canFlip = true;
+            generateCards();
+            shuffleCards();
+            updateBoard();
+            document.getElementById('end-page').style.display = 'none';
+            document.getElementById('game-page').style.display = 'block';
+        }
+
+        function showEndPage() {
+            document.getElementById('game-page').style.display = 'none';
+            document.getElementById('end-page').style.display = 'block';
+        }
+
+        function showLinks() {
+            document.getElementById('end-page').style.display = 'none';
+            document.getElementById('links').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
