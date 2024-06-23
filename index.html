@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess Your Birthday</title>
+    <title>Age Guessing Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,6 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none; /* Hide all containers initially */
         }
 
         h1, h2 {
@@ -45,82 +44,36 @@
             background-color: #555;
         }
 
-        #sticker-selection {
-            margin-bottom: 20px;
-        }
-
-        #sticker-selection img {
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
             width: 80px;
-            height: 80px;
-            cursor: pointer;
-            margin: 0 10px;
-        }
-
-        #color-selection {
-            margin-bottom: 20px;
-        }
-
-        .color-btn {
-            width: 40px;
-            height: 40px;
-            border: none;
-            cursor: pointer;
-            margin: 0 10px;
-        }
-
-        #winnings {
-            display: flex;
-            justify-content: center;
-        }
-
-        #winnings img {
-            width: 80px;
-            height: 80px;
-            margin: 10px;
-        }
-
-        #links {
-            display: none;
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container" id="start-page">
-        <h1>Welcome to the Birthday Guessing Game!</h1>
-        <p>Guess your birthday by selecting stickers and colors!</p>
+        <h1>Nammakam 🙏 - Age Guessing Game</h1>
         <button onclick="startGame()">Start Game</button>
     </div>
     
     <div class="container" id="game-page" style="display:none;">
-        <h2>Guess Your Birthday</h2>
-        <div id="birthday-selection">
-            <p>Select a sticker:</p>
-            <div id="sticker-selection">
-                <img src="sticker1.png" alt="Sticker 1" onclick="selectSticker(1)">
-                <img src="sticker2.png" alt="Sticker 2" onclick="selectSticker(2)">
-                <img src="sticker3.png" alt="Sticker 3" onclick="selectSticker(3)">
-            </div>
-            <p>Select a color:</p>
-            <div id="color-selection">
-                <button class="color-btn" style="background-color: #ffcccb;" onclick="selectColor('#ffcccb')"></button>
-                <button class="color-btn" style="background-color: #aaf0d1;" onclick="selectColor('#aaf0d1')"></button>
-                <button class="color-btn" style="background-color: #ffd700;" onclick="selectColor('#ffd700')"></button>
-            </div>
-            <button onclick="checkBirthday()">Check Birthday</button>
-        </div>
+        <h2>Age Guessing Game</h2>
+        <div id="question"></div>
+        <input type="number" id="answerInput" placeholder="Enter your answer">
+        <button onclick="nextQuestion()">Next Question</button>
     </div>
     
     <div class="container" id="end-page" style="display:none;">
-        <h2>Congratulations!</h2>
-        <p>You've guessed your birthday!</p>
-        <p>Here are your winnings:</p>
-        <div id="winnings">
-            <!-- Display selected sticker and color as winnings -->
-        </div>
+        <h2>Game Over!</h2>
+        <p>The computer has guessed your age.</p>
+        <p>Your age is: <span id="guessedAge"></span></p>
         <button onclick="showLinks()">Useful Links</button>
     </div>
     
-    <footer id="links">
+    <footer id="links" style="display:none;">
         <p>Useful Links:</p>
         <ul>
             <li><a href="https://www.linkedin.com">LinkedIn</a></li>
@@ -130,56 +83,59 @@
     </footer>
 
     <script>
-        let selectedSticker = 0;
-        let selectedColor = '';
+        const questions = [
+            "Are you older than 20?",
+            "Are you younger than 40?",
+            "Are you between 25 and 35 years old?",
+            "Are you in your 30s?",
+            "Are you younger than 25?"
+        ];
+
+        let currentQuestionIndex = 0;
+        let guessedAge = 0;
 
         function startGame() {
             document.getElementById('start-page').style.display = 'none';
             document.getElementById('game-page').style.display = 'block';
+            displayQuestion();
         }
 
-        function selectSticker(stickerNumber) {
-            selectedSticker = stickerNumber;
-            // Highlight selected sticker (if needed)
-            // For example, change border or add a glow effect
-        }
-
-        function selectColor(colorCode) {
-            selectedColor = colorCode;
-            // Highlight selected color (if needed)
-            // For example, change border or add a glow effect
-        }
-
-        function checkBirthday() {
-            if (selectedSticker !== 0 && selectedColor !== '') {
-                // Replace with your logic to check if the selected combination matches the user's birthday
-                // For demonstration, let's assume they always win
-                displayEndPage();
+        function displayQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                document.getElementById('question').textContent = questions[currentQuestionIndex];
             } else {
-                alert('Please select a sticker and a color to continue.');
+                endGame();
             }
         }
 
-        function displayEndPage() {
-            document.getElementById('game-page').style.display = 'none';
-            document.getElementById('end-page').style.display = 'block';
-            displayWinnings();
+        function nextQuestion() {
+            let answer = parseInt(document.getElementById('answerInput').value);
+            if (isNaN(answer)) {
+                alert('Please enter a valid number.');
+                return;
+            }
+
+            if (currentQuestionIndex === 0 && answer >= 20) {
+                guessedAge += answer;
+            } else if (currentQuestionIndex === 1 && answer < 40) {
+                guessedAge += (40 - answer);
+            } else if (currentQuestionIndex === 2 && answer >= 25 && answer <= 35) {
+                guessedAge += answer;
+            } else if (currentQuestionIndex === 3 && answer >= 30) {
+                guessedAge += (answer - 30);
+            } else if (currentQuestionIndex === 4 && answer < 25) {
+                guessedAge += (25 - answer);
+            }
+
+            currentQuestionIndex++;
+            document.getElementById('answerInput').value = '';
+            displayQuestion();
         }
 
-        function displayWinnings() {
-            let winningsContainer = document.getElementById('winnings');
-            winningsContainer.innerHTML = '';
-            
-            // Display selected sticker and color as winnings
-            let stickerImg = document.createElement('img');
-            stickerImg.src = `sticker${selectedSticker}.png`;
-            stickerImg.alt = `Sticker ${selectedSticker}`;
-            winningsContainer.appendChild(stickerImg);
-
-            let colorBtn = document.createElement('button');
-            colorBtn.style.backgroundColor = selectedColor;
-            colorBtn.disabled = true;
-            winningsContainer.appendChild(colorBtn);
+        function endGame() {
+            document.getElementById('game-page').style.display = 'none';
+            document.getElementById('end-page').style.display = 'block';
+            document.getElementById('guessedAge').textContent = guessedAge;
         }
 
         function showLinks() {
