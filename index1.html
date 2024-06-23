@@ -83,7 +83,7 @@
     <div class="container" id="game-page" style="display:none;">
         <h2>Deducing Your Age Game</h2>
         <div id="question"></div>
-        <input type="number" id="answerInput" placeholder="Enter your answer">
+        <div id="result"></div>
         <button onclick="nextStep()">Next Step</button>
     </div>
     
@@ -113,12 +113,19 @@
 
         let currentStepIndex = 0;
         let intermediateResult = 0;
-        let age = 0;
+        let firstDigit = 0;
+        let secondDigit = 0;
 
         function startGame() {
             document.getElementById('start-page').style.display = 'none';
             document.getElementById('game-page').style.display = 'block';
+            let age = prompt("Please enter your age:");
+            age = parseInt(age);
+            firstDigit = Math.floor(age / 10);
+            secondDigit = age % 10;
+            intermediateResult = firstDigit * 5;
             displayQuestion();
+            displayResult();
         }
 
         function displayQuestion() {
@@ -129,34 +136,30 @@
             }
         }
 
-        function nextStep() {
-            let answer = parseInt(document.getElementById('answerInput').value);
-            if (isNaN(answer)) {
-                alert('Please enter a valid number.');
-                return;
-            }
+        function displayResult() {
+            document.getElementById('result').textContent = `Current Result: ${intermediateResult}`;
+        }
 
-            if (currentStepIndex === 0) {
-                intermediateResult = answer;
-            } else if (currentStepIndex === 1) {
+        function nextStep() {
+            if (currentStepIndex === 1) {
                 intermediateResult += 3;
             } else if (currentStepIndex === 2) {
                 intermediateResult *= 2;
             } else if (currentStepIndex === 3) {
-                intermediateResult += answer;
+                intermediateResult += secondDigit;
             } else if (currentStepIndex === 4) {
-                age = intermediateResult - 6;
+                intermediateResult -= 6;
             }
 
             currentStepIndex++;
-            document.getElementById('answerInput').value = '';
             displayQuestion();
+            displayResult();
         }
 
         function endGame() {
             document.getElementById('game-page').style.display = 'none';
             document.getElementById('end-page').style.display = 'block';
-            document.getElementById('guessedAge').textContent = age;
+            document.getElementById('guessedAge').textContent = intermediateResult;
         }
 
         function showLinks() {
