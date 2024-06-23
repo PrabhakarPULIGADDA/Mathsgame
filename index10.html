@@ -69,11 +69,7 @@
         <div class="instructions">
             <h3>Instructions:</h3>
             <ol>
-                <li>Multiply the first number of your age by five.</li>
-                <li>Add three to the result.</li>
-                <li>Double the resulting figure.</li>
-                <li>Add the second number of your age to that number.</li>
-                <li>Subtract six. The result will be your current age.</li>
+                <li>Follw my steps and let me CalculateYour age😁.</li>
             </ol>
             <p>Click "Start Game" to begin.</p>
         </div>
@@ -83,8 +79,9 @@
     <div class="container" id="game-page" style="display:none;">
         <h2>Deducing Your Age Game</h2>
         <div id="question"></div>
-        <div id="result"></div>
+        <input type="number" id="userInput">
         <button onclick="nextStep()">Next Step</button>
+        <div id="result"></div>
     </div>
     
     <div class="container" id="end-page" style="display:none;">
@@ -119,41 +116,46 @@
         function startGame() {
             document.getElementById('start-page').style.display = 'none';
             document.getElementById('game-page').style.display = 'block';
-            let age = prompt("Please enter your age:");
-            age = parseInt(age);
-            firstDigit = Math.floor(age / 10);
-            secondDigit = age % 10;
-            intermediateResult = firstDigit * 5;
             displayQuestion();
-            displayResult();
         }
 
         function displayQuestion() {
             if (currentStepIndex < steps.length) {
                 document.getElementById('question').textContent = steps[currentStepIndex];
+                document.getElementById('userInput').style.display = 'block';
             } else {
                 endGame();
             }
         }
 
-        function displayResult() {
-            document.getElementById('result').textContent = `Current Result: ${intermediateResult}`;
-        }
-
         function nextStep() {
-            if (currentStepIndex === 1) {
+            const userInput = parseInt(document.getElementById('userInput').value);
+
+            if (isNaN(userInput)) {
+                alert("Please enter a valid number.");
+                return;
+            }
+
+            if (currentStepIndex === 0) {
+                intermediateResult = userInput * 5;
+            } else if (currentStepIndex === 1) {
                 intermediateResult += 3;
             } else if (currentStepIndex === 2) {
                 intermediateResult *= 2;
             } else if (currentStepIndex === 3) {
-                intermediateResult += secondDigit;
+                intermediateResult += userInput;
             } else if (currentStepIndex === 4) {
                 intermediateResult -= 6;
             }
 
+            document.getElementById('userInput').value = '';
             currentStepIndex++;
             displayQuestion();
             displayResult();
+        }
+
+        function displayResult() {
+            document.getElementById('result').textContent = `Current Result: ${intermediateResult}`;
         }
 
         function endGame() {
